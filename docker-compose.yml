@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  # The Brain (Your existing code)
+  sentinel-backend:
+    build: ./backend
+    ports:
+      - "80:8000"
+    env_file:
+      - .env

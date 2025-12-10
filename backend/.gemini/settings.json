@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "raindrop-mcp": {
+      "httpUrl": "https://raindrop-mcp.01ka7z4av42krq98293bn88fqv.lmapp.run/mcp",
+      "trust": true
+    }
+  }
+}

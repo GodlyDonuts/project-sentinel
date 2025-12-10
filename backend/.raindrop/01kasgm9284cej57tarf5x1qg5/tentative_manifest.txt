@@ -1,0 +1,26 @@
+application "project-sentinel" {
+
+  service "api-gateway" {
+    visibility = "public"
+  }
+
+  service "intelligence-service" {
+    visibility = "private"
+  }
+
+  service "voice-service" {
+    visibility = "private"
+  }
+
+  service "storage-service" {
+    visibility = "private"
+  }
+
+  actor "memory-service" {
+    visibility = "private"
+  }
+
+  sql_database "sentinel-db" {}
+
+  smartmemory "agent-memory" {}
+}

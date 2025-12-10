@@ -1,0 +1,17 @@
+{
+    "mcpServers": {
+        "liquidmetal": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "mcp-remote",
+                "https://mcp.raindrop.run/sse",
+                "--header",
+                "Authorization: Bearer ${RAINDROP_API_KEY}"
+            ],
+            "env": {
+                "RAINDROP_API_KEY": "lm_apikey_1576a0079c504b46acff75e9c10bc80df35a282151f048d2"
+            }
+        }
+    }
+}

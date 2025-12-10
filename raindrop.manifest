@@ -1,0 +1,13 @@
+// Raindrop Manifest
+// Configured for Project Sentinel
+
+application "project-sentinel" {
+
+  // === SmartBuckets ===
+  // Used for storing police reports and evidence
+  smartbucket "sentinel-evidence-sb" {}
+
+  // Used for storing scam patterns and agent memory
+  smartbucket "agent-memory-sb" {}
+
+}

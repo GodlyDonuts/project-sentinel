@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+websockets
+workos>=4.2.0
+
+python-multipart
+requests
+pydantic
+httpx
+httpx
+openai
+python-dotenv
+lm-raindrop
+stripe
+deepgram-sdk

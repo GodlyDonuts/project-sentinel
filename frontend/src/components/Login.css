@@ -1,0 +1,82 @@
+.login-container {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+    background-image: radial-gradient(circle at center, #111 0%, #000 100%);
+}
+
+.login-card {
+    text-align: center;
+    padding: 3rem;
+    border: 1px solid #333;
+    border-radius: 16px;
+    background: rgba(20, 20, 20, 0.8);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 40px rgba(0, 255, 0, 0.1);
+}
+
+.login-card h1 {
+    color: white;
+    margin: 1rem 0 0.5rem;
+    letter-spacing: 4px;
+}
+
+.login-card p {
+    color: #888;
+    margin-bottom: 2rem;
+}
+
+.login-btn {
+    background: #00ff00;
+    color: black;
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.login-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
+}
+
+.error-msg {
+    color: #ff4444;
+    background: rgba(255, 0, 0, 0.1);
+    padding: 0.5rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.debug-msg {
+    color: #666;
+    font-size: 0.8rem;
+    margin-top: 1rem;
+}
+
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+
+/* Add to src/components/Login.css */
+
+.login-card {
+    /* Existing styles... */
+    background: rgba(10, 10, 10, 0.95);
+    /* Darker, more solid background */
+    border: 1px solid rgba(0, 255, 0, 0.15);
+    /* Subtle green border */
+}
+
+/* Ensure the Google button looks distinct from the Sentinel theme */
+button.google-btn {
+    background: white;
+    color: black;
+}

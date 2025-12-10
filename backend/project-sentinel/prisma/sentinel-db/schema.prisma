@@ -1,0 +1,26 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Scam {
+  id              String    @id @default(cuid())
+  content         String
+  analysis_result String?
+  source          String?
+  createdAt       DateTime  @default(now())
+  voiceRecords    VoiceRecord[]
+}
+
+model VoiceRecord {
+  id            String    @id @default(cuid())
+  audioBlob     Bytes
+  transcription String?
+  scamId        String?
+  createdAt     DateTime  @default(now())
+  scam          Scam?     @relation(fields: [scamId], references: [id])
+}

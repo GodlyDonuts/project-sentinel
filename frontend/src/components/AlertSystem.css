@@ -1,0 +1,86 @@
+.alert-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1000;
+    pointer-events: none;
+    /* Let clicks pass through mostly, but capture for button */
+}
+
+.vignette {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.alert-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: auto;
+}
+
+.alert-box {
+    background: rgba(20, 0, 0, 0.9);
+    border: 2px solid red;
+    padding: 2rem;
+    border-radius: 8px;
+    color: red;
+    box-shadow: 0 0 50px rgba(255, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.alert-box h1 {
+    font-size: 2.5rem;
+    margin: 0;
+    letter-spacing: 2px;
+    font-weight: 900;
+}
+
+.reason {
+    font-size: 1.5rem;
+    color: #ffcccc;
+}
+
+.action {
+    font-weight: bold;
+    animation: blink 0.5s infinite;
+}
+
+.dismiss-btn {
+    background: transparent;
+    border: 1px solid red;
+    color: red;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    margin-top: 1rem;
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+}
+
+.dismiss-btn:hover {
+    background: red;
+    color: black;
+}
+
+@keyframes blink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}

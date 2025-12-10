@@ -1,0 +1,38 @@
+application "project-sentinel" {
+
+  // --- Public Gateway ---
+  service "api-gateway" {
+    visibility = "public"
+    // Needs WorkOS keys for authentication
+    env "WORKOS_CLIENT_ID" { secret = true }
+    env "WORKOS_API_KEY" { secret = true }
+  }
+
+  // --- Intelligence (The Brain) ---
+  service "intelligence-service" {
+    visibility = "private"
+    // Needs AI Provider keys
+    env "CEREBRAS_API_KEY" { secret = true }
+    env "VULTR_API_KEY" { secret = true }
+  }
+
+  // --- Voice (The Mouth) ---
+  service "voice-service" {
+    visibility = "private"
+    // Needs ElevenLabs key
+    env "ELEVENLABS_API_KEY" { secret = true }
+  }
+
+  // --- Storage & Memory ---
+  service "storage-service" {
+    visibility = "private"
+  }
+
+  actor "memory-service" {
+    visibility = "private"
+  }
+
+  sql_database "sentinel-db" {}
+  smartbucket "sentinel-evidence-sb" {}
+  smartbucket "agent-memory-sb" {}
+}

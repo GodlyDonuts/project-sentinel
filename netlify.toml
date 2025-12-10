@@ -1,0 +1,10 @@
+[build]
+  # 1. This sets the working directory to your frontend folder
+  base = "frontend"
+
+  # 2. This is where the build output goes (relative to the base!)
+  # Common values: "dist", "build", "public"
+  publish = "dist" 
+
+  # 3. The command to build your site
+  command = "npm run build"

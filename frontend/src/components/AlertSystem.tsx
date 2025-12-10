@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertTriangle, Ghost, ShieldAlert } from 'lucide-react';
+import { Ghost, ShieldAlert } from 'lucide-react';
 import './AlertSystem.css';
 
 interface AlertSystemProps {

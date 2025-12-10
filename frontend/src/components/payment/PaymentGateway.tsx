@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { motion } from 'framer-motion';
-import { Shield, Lock, CreditCard, CheckCircle } from 'lucide-react';
+import { Shield, Lock, CreditCard, CheckCircle, X } from 'lucide-react';
 import { HoloCard } from '../ui/HoloCard';
 import { sentinelStripeTheme } from '../../config/stripeTheme';
 import { useSoundEffects } from '../../hooks/useSoundEffects';
@@ -107,10 +107,17 @@ interface PaymentGatewayProps {
 export const PaymentGateway: React.FC<PaymentGatewayProps> = ({ clientSecret, onClose, userId }) => {
     const [success, setSuccess] = useState(false);
 
+    // Close on backdrop click (but not content click)
+    const handleBackdropClick = (e: React.MouseEvent) => {
+        if (e.target === e.currentTarget) {
+            onClose();
+        }
+    };
+
     // Success State UI
     if (success) {
         return (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md p-4">
+            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md p-4" onClick={handleBackdropClick}>
                 <HoloCard className="max-w-md w-full p-8 border-sentinel-green/50 bg-black/80 flex flex-col items-center text-center">
                     <motion.div
                         initial={{ scale: 0 }} animate={{ scale: 1 }}
@@ -130,12 +137,17 @@ export const PaymentGateway: React.FC<PaymentGatewayProps> = ({ clientSecret, on
 
     // Payment Form UI
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md p-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md p-4" onClick={handleBackdropClick}>
             <motion.div
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="w-full max-w-lg"
+                className="w-full max-w-lg relative"
             >
+                {/* Close Button */}
+                <button onClick={onClose} className="absolute -top-10 right-0 p-2 text-white/50 hover:text-white transition-colors">
+                    <X size={24} />
+                </button>
+
                 <HoloCard className="p-1 border-white/10 bg-black max-h-[85vh] flex flex-col">
                     {/* Header Bar */}
                     <div className="bg-white/5 p-4 border-b border-white/10 flex justify-between items-center shrink-0">

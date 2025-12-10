@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Brain, Radio, Zap, ShieldAlert, Database, Cpu, Activity, Mic } from 'lucide-react';
-import { HoloCard } from '../ui/HoloCard';
+import { Brain, Zap, Activity, Mic, Cpu, Database } from 'lucide-react';
 
 // THE SCRIPT: A simulated "Grandma" persona trolling a scammer
 // We explicitly log the "Tech Stack" events here for the judges to see.
@@ -32,7 +31,7 @@ export const GhostInterceptor = ({ onDisengage }: { onDisengage: () => void }) =
         }, 100);
 
         // Run Script
-        let timeouts: NodeJS.Timeout[] = [];
+        let timeouts: ReturnType<typeof setTimeout>[] = [];
         GHOST_SCRIPT.forEach((step, index) => {
             const t = setTimeout(() => {
                 setLogs(prev => [...prev, { ...step, id: Date.now() }]);
@@ -52,7 +51,7 @@ export const GhostInterceptor = ({ onDisengage }: { onDisengage: () => void }) =
     }, [logs]);
 
     return (
-        <div className="flex flex-col h-full bg-black/90 backdrop-blur-2xl border-2 border-purple-500/30 rounded-2xl overflow-hidden relative shadow-[0_0_50px_rgba(168,85,247,0.1)]">
+        <div className="flex flex-col h-full bg-black/40 backdrop-blur-md border border-purple-500/30 rounded-2xl overflow-hidden relative shadow-[0_0_50px_rgba(168,85,247,0.1)]">
 
             {/* Header: The Tech Stack Flex */}
             <div className="flex items-center justify-between p-4 border-b border-purple-500/20 bg-black/40 z-10">
@@ -114,15 +113,17 @@ export const GhostInterceptor = ({ onDisengage }: { onDisengage: () => void }) =
 
                                 {/* SPEECH BUBBLES */}
                                 {(log.type === 'scammer' || log.type === 'ghost') && (
-                                    <div className={`p-4 rounded-2xl max-w-[85%] text-sm font-sans relative shadow-lg
+                                    <div className={`p-4 rounded-2xl max-w-[85%] text-sm font-sans relative shadow-[0_0_15px_rgba(0,0,0,0.5)] backdrop-blur-md
                                         ${log.type === 'scammer'
-                                            ? 'bg-red-950/40 border border-red-900/50 text-red-200 rounded-tl-none'
+                                            ? 'bg-red-950/20 border border-red-500/30 text-red-200 rounded-tl-none'
                                             : 'bg-purple-900/20 border border-purple-500/30 text-white rounded-tr-none'
                                         }`}
                                     >
-                                        <div className="text-[9px] font-bold opacity-50 mb-2 uppercase tracking-widest flex justify-between">
-                                            <span>{log.type === 'ghost' ? 'SENTINEL PERSONA: GRANDMA' : 'THREAT ACTOR'}</span>
-                                            {log.type === 'ghost' && <span className="text-purple-400 flex items-center gap-1"><Mic size={8} /> VOICE SYNTHESIZED</span>}
+                                        <div className="text-[9px] font-bold opacity-70 mb-2 uppercase tracking-widest flex justify-between">
+                                            <span className={log.type === 'scammer' ? 'text-red-400' : 'text-purple-400'}>
+                                                {log.type === 'ghost' ? 'SENTINEL PERSONA: GRANDMA' : 'THREAT ACTOR'}
+                                            </span>
+                                            {log.type === 'ghost' && <span className="text-purple-400 flex items-center gap-1"><Mic size={8} /> SYNTHESIZED</span>}
                                         </div>
                                         {log.text}
                                     </div>

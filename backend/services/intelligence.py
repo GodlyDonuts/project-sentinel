@@ -47,7 +47,9 @@ async def analyze_threat(text: str) -> dict:
     """
     prompt = (
         "You are a security guardian. Analyze this text for social engineering or financial fraud. "
-        "If it indicates a scam (urgency, financial demand, threats), output JSON: "
+        "Ignore benign greetings (like 'Hi Grandma', 'Hello', 'How are you') and innocent conversation. "
+        "Only flag as threat if there is clear malicious context (urgency, financial demand, threats, asking for personal info). "
+        "If it indicates a scam, output JSON: "
         "{ 'is_threat': true, 'confidence': float, 'reason': 'Financial Pressure' }. "
         "Otherwise { 'is_threat': false, 'confidence': float, 'reason': 'Safe' }. "
         "Do not output markdown code blocks, just the JSON string."

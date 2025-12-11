@@ -81,18 +81,17 @@ async def create_checkout_session(request: CheckoutSessionRequest):
         if not payment_intent and hasattr(latest_invoice, 'payment_intent'):
              payment_intent = latest_invoice.payment_intent
 
-        # Validate we found something
+        # Strategy 3: Search for PI explicitly by Customer (if invoice data was shallow)
         if not payment_intent:
-             print(f"DEBUG: PaymentIntent missing in Invoice: {latest_invoice}")
-             # Strategy 3: Search for PI explicitly by Customer (since invoice filter is invalid)
+             print(f"DEBUG: PaymentIntent missing in Invoice, searching by customer...")
              if customer and hasattr(customer, 'id'):
-                 print("DEBUG: Searching for PaymentIntent by Customer ID...")
                  pis = stripe.PaymentIntent.list(customer=customer.id, limit=1)
                  if pis and pis.data:
+                     # Check if this PI is related to the subscription (optional but safer)
                      payment_intent = pis.data[0]
                      print(f"DEBUG: Found pending PI for customer: {payment_intent.get('id')}")
 
-        # Extract Client Secret
+        # Final Extraction of Client Secret
         if payment_intent:
              if isinstance(payment_intent, str):
                  # If we only got an ID, retrieve the object
@@ -104,15 +103,8 @@ async def create_checkout_session(request: CheckoutSessionRequest):
              elif isinstance(payment_intent, dict):
                  client_secret = payment_intent.get('client_secret')
 
-        client_secret = None
-        if payment_intent:
-             # PaymentIntent object also needs safe access
-             if hasattr(payment_intent, 'client_secret'):
-                 client_secret = payment_intent.client_secret
-             else:
-                 client_secret = payment_intent.get('client_secret')
-
         if not client_secret:
+             print(f"CRITICAL: Could not find client_secret. PI object: {payment_intent}")
              raise HTTPException(status_code=500, detail="Failed to retrieve client_secret")
 
         return {"clientSecret": client_secret}

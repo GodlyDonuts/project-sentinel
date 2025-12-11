@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 
 interface WebSocketProps {
     onAudioData: (blob: Blob) => void;
-    onTranscriptUpdate?: (text: string) => void;
+    onTranscriptUpdate?: (text: string, isFinal: boolean) => void;
 }
 
 export const useWebSocket = ({ onAudioData, onTranscriptUpdate }: WebSocketProps) => {
@@ -12,12 +12,23 @@ export const useWebSocket = ({ onAudioData, onTranscriptUpdate }: WebSocketProps
     const [threatScore, setThreatScore] = useState(0);
     const ws = useRef<WebSocket | null>(null);
 
+    // Refs to keep callbacks stable without triggering re-connection
+    const onAudioDataRef = useRef(onAudioData);
+    const onTranscriptUpdateRef = useRef(onTranscriptUpdate);
+
     useEffect(() => {
+        onAudioDataRef.current = onAudioData;
+        onTranscriptUpdateRef.current = onTranscriptUpdate;
+    }, [onAudioData, onTranscriptUpdate]);
+
+    useEffect(() => {
+        let isMounted = true;
         let reconnectTimeout: ReturnType<typeof setTimeout>;
         let heartbeatInterval: ReturnType<typeof setInterval>;
         let socket: WebSocket | null = null;
 
         const connect = () => {
+            if (!isMounted) return;
             if (ws.current?.readyState === WebSocket.OPEN || ws.current?.readyState === WebSocket.CONNECTING) {
                 return;
             }
@@ -31,6 +42,7 @@ export const useWebSocket = ({ onAudioData, onTranscriptUpdate }: WebSocketProps
             ws.current = socket;
 
             socket.onopen = () => {
+                if (!isMounted) return;
                 console.log('Connected to Sentinel Backend');
                 setIsConnected(true);
 
@@ -42,27 +54,34 @@ export const useWebSocket = ({ onAudioData, onTranscriptUpdate }: WebSocketProps
             };
 
             socket.onmessage = async (event) => {
+                if (!isMounted) return;
                 if (event.data === "PONG") return;
 
                 if (event.data instanceof Blob) {
-                    onAudioData(event.data);
+                    if (onAudioDataRef.current) {
+                        onAudioDataRef.current(event.data);
+                    }
                 } else {
                     try {
                         const data = JSON.parse(event.data);
+                        console.log('WS Message Received:', data); // DEBUG LOG
 
                         // Handle Transcript Updates from Whisper
-                        if (data.transcript_update && onTranscriptUpdate) {
-                            onTranscriptUpdate(data.transcript_update);
+                        if (data.transcript_update && onTranscriptUpdateRef.current) {
+                            onTranscriptUpdateRef.current(data.transcript_update, data.is_final || false);
                         }
 
                         // Handle Threat Analysis
                         if (data.analysis) {
+                            console.log('Processing Threat Analysis:', data.analysis); // DEBUG LOG
                             if (typeof data.analysis.confidence === 'number') {
                                 setThreatScore(data.analysis.confidence);
+                                console.log('Threat Score Updated:', data.analysis.confidence);
                             }
                             if (data.analysis.is_threat) {
                                 setIsThreat(true);
                                 setThreatReason(data.analysis.reason);
+                                console.log('Threat Detected:', data.analysis.reason);
                             }
                         }
                     } catch (e) {
@@ -73,23 +92,28 @@ export const useWebSocket = ({ onAudioData, onTranscriptUpdate }: WebSocketProps
 
             socket.onclose = () => {
                 console.log('Disconnected');
-                setIsConnected(false);
-                clearInterval(heartbeatInterval);
-                reconnectTimeout = setTimeout(() => {
-                    console.log('Attempting to reconnect...');
-                    connect();
-                }, 3000);
+                if (isMounted) {
+                    setIsConnected(false);
+                    clearInterval(heartbeatInterval);
+                    reconnectTimeout = setTimeout(() => {
+                        if (isMounted) {
+                            console.log('Attempting to reconnect...');
+                            connect();
+                        }
+                    }, 3000);
+                }
             };
         };
 
         connect();
 
         return () => {
+            isMounted = false;
             if (socket) socket.close();
             clearTimeout(reconnectTimeout);
             clearInterval(heartbeatInterval);
         };
-    }, [onAudioData, onTranscriptUpdate]);
+    }, []); // Empty dependency array = connect on mount only
 
     const sendMessage = useCallback((msg: string) => {
         if (ws.current?.readyState === WebSocket.OPEN) {
@@ -109,6 +133,7 @@ export const useWebSocket = ({ onAudioData, onTranscriptUpdate }: WebSocketProps
         setIsThreat,
         threatReason,
         threatScore,
+        setThreatScore, // Expose setter
         sendMessage,
         sendAudio,
         wsRef: ws

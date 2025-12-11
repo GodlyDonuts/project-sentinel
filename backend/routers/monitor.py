@@ -18,76 +18,129 @@ async def websocket_endpoint(websocket: WebSocket):
     logger.info("WebSocket connection established (Deepgram Mode)")
     
     deepgram_client = AsyncDeepgramClient()
+    ws_lock = asyncio.Lock()  # Synchronize writes
     
+    # helper to check threats (Inner function captures websocket & lock)
+    async def process_threat_inner(text: str):
+        try:
+            if len(text) < 25: # limit analysis to sentences with enough context
+                return
+
+            result = await analyze_threat(text)
+            
+            is_threat = result.get("is_threat", False)
+            confidence_score = result.get("confidence", 0.0)
+            reasons = result.get("reason", "Unknown")
+            
+            threat_level = int(confidence_score * 100)
+            
+            # Send full analysis object
+            if threat_level > 50:
+                 alert = {
+                    "analysis": {
+                        "is_threat": True,
+                        "confidence": threat_level,
+                        "reason": reasons
+                    }
+                 }
+                 # CRITICAL: Lock usage
+                 async with ws_lock:
+                     await websocket.send_json(alert)
+                 
+                 if threat_level > 80:
+                    logger.warning(f"HIGH THREAT: {reasons}")
+
+        except Exception as e:
+            logger.error(f"Threat Analysis Error: {e}")
+
     try:
-        # 1. Start Deepgram Connection (Async Context Manager)
-        # Reverting to manual KeepAlive as native support caused TypeError
         async with deepgram_client.listen.v1.connect(
             model="nova-2",
             language="en-US",
             smart_format=True,
-            interim_results=False,
+            interim_results=True,
             endpointing=300
         ) as dg_connection:
             
-            # 2. Define Receiver Task (Deepgram -> Frontend)
             async def receive_from_deepgram():
+                conversation_history = []
                 try:
                     async for message in dg_connection:
                         transcript_text = ""
                         is_final = False
                         
                         try:
-                            if hasattr(message, "channel"):
-                                val = message.channel
-                                if hasattr(val, "alternatives"):
-                                    alts = val.alternatives
-                                    if alts and len(alts) > 0:
-                                        transcript_text = alts[0].transcript
-                            
-                            if hasattr(message, "is_final"):
-                                is_final = message.is_final
-                        except Exception:
-                            pass
+                            if isinstance(message, dict):
+                                msg_channel = message.get("channel")
+                                msg_is_final = message.get("is_final")
+                            else:
+                                msg_channel = getattr(message, "channel", None)
+                                msg_is_final = getattr(message, "is_final", None)
+
+                            if msg_is_final is not None:
+                                is_final = msg_is_final
+
+                            if msg_channel:
+                                if isinstance(msg_channel, dict):
+                                    alts = msg_channel.get("alternatives", [])
+                                else:
+                                    alts = getattr(msg_channel, "alternatives", [])
+
+                                if alts and len(alts) > 0:
+                                    first_alt = alts[0]
+                                    if isinstance(first_alt, dict):
+                                        transcript_text = first_alt.get("transcript", "")
+                                    else:
+                                        transcript_text = getattr(first_alt, "transcript", "")
+                        except Exception as parse_err:
+                            logger.error(f"Parsing error: {parse_err}")
 
                         if transcript_text:
-                            response = {"transcript_update": transcript_text}
-                            await websocket.send_json(response)
+                            response = {
+                                "transcript_update": transcript_text,
+                                "is_final": is_final
+                            }
+                            # Capture lock for safety
+                            async with ws_lock:
+                                await websocket.send_json(response)
 
+                            current_context = conversation_history[:] 
+                            current_context.append(transcript_text)
+                            full_context = " ".join(current_context)
+                            
                             if is_final:
-                                logger.info(f"Final Transcript: {transcript_text}")
-                                asyncio.create_task(process_threat(transcript_text, websocket))
+                                conversation_history.append(transcript_text)
+
+                            # Fire and forget analysis
+                            asyncio.create_task(process_threat_inner(full_context))
                                 
                 except Exception as e:
-                    # Ignore normal connection closures
-                    if "1000" in str(e) or "1011" in str(e):
-                         logger.info(f"Deepgram connection closed: {e}")
-                    else:
-                         logger.error(f"Error in Deepgram receiver: {e}")
+                    logger.info(f"Deepgram receiver closed: {e}")
+                finally:
+                     try:
+                         # Force close to reset state if loop dies
+                         await websocket.close()
+                     except:
+                         pass
 
-            # 3. Define KeepAlive Task (Robust)
-            # Sends a blank JSON message periodically to keep the websocket open
             async def keep_alive_loop():
                 try:
                     while True:
                         await asyncio.sleep(5)
                         try:
                             # Using raw json string via send_control
-                            # If this fails, log it but DO NOT CRASH the loop
                             await dg_connection.send_control('{"type": "KeepAlive"}')
                         except Exception as e:
-                            # Log connection issues but keep trying until outer cancellation
                             logger.debug(f"KeepAlive transient error: {e}")
                 except asyncio.CancelledError:
                     pass
                 except Exception as e:
                     logger.error(f"KeepAlive loop crashed: {e}")
-
+            
             # Start tasks
             receive_task = asyncio.create_task(receive_from_deepgram())
             keepalive_task = asyncio.create_task(keep_alive_loop())
 
-            # 4. Main Loop: Audio from Frontend -> Deepgram
             try:
                 while True:
                     message = await websocket.receive()
@@ -99,11 +152,11 @@ async def websocket_endpoint(websocket: WebSocket):
                     
                     elif "text" in message:
                         if message["text"] == "PING":
-                            await websocket.send_text("PONG")
+                            async with ws_lock:
+                                await websocket.send_text("PONG")
             except WebSocketDisconnect:
                 logger.info("WebSocket disconnected")
             finally:
-                # Cancel background tasks
                 receive_task.cancel()
                 keepalive_task.cancel()
                 try:
@@ -114,32 +167,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
     except Exception as e:
         logger.error(f"Deepgram Connection Error: {e}")
-        await websocket.close()
-
-async def process_threat(text: str, websocket: WebSocket):
-    """
-    Analyzes text for threats and pushes alerts to frontend
-    """
-    try:
-        # Check for length to avoid "Hello" fps
-        if len(text) < 15:
-            return
-
-        threat_level, reasons = await analyze_threat(text)
-        
-        # Send full analysis object so frontend handles Red Screen/Globe/etc
-        if threat_level > 50:
-             alert = {
-                "threat_alert": {
-                    "level": threat_level,
-                    "reasons": reasons,
-                    "text": text
-                }
-             }
-             await websocket.send_json(alert)
-             
-             if threat_level > 80:
-                logger.warning(f"HIGH THREAT DETECTED: {reasons}")
-
-    except Exception as e:
-        logger.error(f"Threat Analysis Error: {e}")
+        try:
+             await websocket.close()
+        except:
+             pass

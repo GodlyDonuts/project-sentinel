@@ -5,10 +5,19 @@ import './AlertSystem.css';
 
 interface AlertSystemProps {
     threatScore: number;
+    isPremium: boolean;
     onEngageGhost: () => void;
+    onUpgrade: () => void;
+    onDismiss: () => void;
 }
 
-export const AlertSystem: React.FC<AlertSystemProps> = ({ threatScore, onEngageGhost }) => {
+export const AlertSystem: React.FC<AlertSystemProps> = ({
+    threatScore,
+    isPremium,
+    onEngageGhost,
+    onUpgrade,
+    onDismiss
+}) => {
     // Force true for demo purposes if score is high
     const isThreat = threatScore > 0.7;
 
@@ -46,19 +55,34 @@ export const AlertSystem: React.FC<AlertSystemProps> = ({ threatScore, onEngageG
                                 </p>
 
                                 <div className="grid gap-4 w-full max-w-sm">
-                                    {/* The Hero Button */}
-                                    <button
-                                        onClick={onEngageGhost}
-                                        className="group relative w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-4 rounded-lg shadow-[0_0_30px_rgba(147,51,234,0.4)] border border-purple-400 transition-all overflow-hidden"
-                                    >
-                                        <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-                                        <div className="relative flex items-center justify-center gap-3">
-                                            <Ghost size={24} />
-                                            <span className="tracking-widest">ENGAGE GHOST AGENT</span>
-                                        </div>
-                                    </button>
+                                    {/* The Hero Button - Context Aware */}
+                                    {isPremium ? (
+                                        <button
+                                            onClick={onEngageGhost}
+                                            className="group relative w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-4 rounded-lg shadow-[0_0_30px_rgba(147,51,234,0.4)] border border-purple-400 transition-all overflow-hidden"
+                                        >
+                                            <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                                            <div className="relative flex items-center justify-center gap-3">
+                                                <Ghost size={24} />
+                                                <span className="tracking-widest">ENGAGE GHOST AGENT</span>
+                                            </div>
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={onUpgrade}
+                                            className="group relative w-full bg-sentinel-green/20 hover:bg-sentinel-green/30 text-sentinel-green font-bold py-4 rounded-lg shadow-[0_0_30px_rgba(0,255,65,0.2)] border border-sentinel-green/50 transition-all overflow-hidden"
+                                        >
+                                            <div className="absolute inset-0 bg-sentinel-green/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                                            <div className="relative flex items-center justify-center gap-3">
+                                                <span className="tracking-widest">UPGRADE TO DEFEND</span>
+                                            </div>
+                                        </button>
+                                    )}
 
-                                    <button className="text-zinc-500 text-xs hover:text-white transition-colors uppercase tracking-widest mt-2">
+                                    <button
+                                        onClick={onDismiss}
+                                        className="text-zinc-500 text-xs hover:text-white transition-colors uppercase tracking-widest mt-2"
+                                    >
                                         Dismiss & Archive Report
                                     </button>
                                 </div>

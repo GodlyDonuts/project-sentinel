@@ -13,7 +13,8 @@ import { PaymentGateway } from './payment/PaymentGateway'; // Keep payment acces
 import './Dashboard.css';
 
 export const Dashboard: React.FC = () => {
-    const [transcript, setTranscript] = useState<string[]>([]);
+    const [finalizedLines, setFinalizedLines] = useState<string[]>([]);
+    const [interimLine, setInterimLine] = useState('');
     const [ghostMode, setGhostMode] = useState(false);
     const [showPaywall, setShowPaywall] = useState(false);
     const [clientSecret, setClientSecret] = useState<string | null>(null);
@@ -23,13 +24,25 @@ export const Dashboard: React.FC = () => {
     const { playAudio, audioRef } = useAudioProcessing();
     const { playClick, playHover, playAlert, playConfirm } = useSoundEffects();
 
-    const handleTranscriptUpdate = useCallback((text: string) => {
-        setTranscript(prev => [...prev, text]);
-    }, []);
-
-    const { isConnected, isThreat, threatScore, sendAudio } = useWebSocket({
-        onAudioData: playAudio,
-        onTranscriptUpdate: handleTranscriptUpdate
+    const {
+        isConnected,
+        isThreat,
+        setIsThreat,
+        threatScore,
+        setThreatScore,
+        sendAudio
+    } = useWebSocket({
+        onAudioData: (blob) => {
+            playAudio(blob);
+        },
+        onTranscriptUpdate: (text: string, isFinal: boolean) => {
+            if (isFinal) {
+                setFinalizedLines(prev => [...prev, text]);
+                setInterimLine('');
+            } else {
+                setInterimLine(text);
+            }
+        }
     });
 
     React.useEffect(() => { if (isThreat) playAlert(); }, [isThreat, playAlert]);
@@ -70,6 +83,8 @@ export const Dashboard: React.FC = () => {
         }
     };
 
+    const fullTranscriptForOverlay = [...finalizedLines, interimLine].filter(Boolean);
+
     return (
         <div className="h-screen w-screen bg-[#050505] text-white overflow-hidden relative selection:bg-sentinel-green selection:text-black font-sans">
 
@@ -83,7 +98,19 @@ export const Dashboard: React.FC = () => {
             </div>
 
             {/* 2. LAYER: CRITICAL ALERTS */}
-            <AlertSystem threatScore={threatScore} onEngageGhost={() => { playConfirm(); setGhostMode(true); }} />
+            <AlertSystem
+                threatScore={threatScore}
+                isPremium={user?.metadata?.premium === 'true'}
+                onEngageGhost={() => {
+                    playConfirm();
+                    setGhostMode(true);
+                }}
+                onUpgrade={handleUpgrade}
+                onDismiss={() => {
+                    setThreatScore(0);
+                    setIsThreat(false);
+                }}
+            />
             <audio ref={audioRef} style={{ display: 'none' }} />
 
             {/* 3. LAYER: HUD INTERFACE (Minimalist) */}
@@ -162,7 +189,7 @@ export const Dashboard: React.FC = () => {
                         <GhostInterceptor onDisengage={() => setGhostMode(false)} />
                     </div>
                 ) : (
-                    <TranscriptOverlay transcript={transcript} isListening={isListening} />
+                    <TranscriptOverlay transcript={fullTranscriptForOverlay} isListening={isListening} />
                 )}
             </div>
 

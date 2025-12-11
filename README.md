@@ -49,6 +49,54 @@ Project Sentinel is built on a modern, decoupled architecture designed for scala
 
 ---
 
+## ⚡ Technology Stack
+
+High-performance, scalable, and modern technologies powering Project Sentinel.
+
+### **Core**
+*   **Languages**: TypeScript (Frontend), Python 3.12 (Backend), Bash (Scripts).
+*   **Aesthetic**: "Cyber-Hacker" Theme (Custom CSS Variables, Tailwind CSS).
+
+### **Frontend (Client)**
+*   **Framework**: React 18
+*   **Build Tool**: Vite
+*   **Styling**: Tailwind CSS, PostCSS.
+*   **Motion & 3D**:
+    *   `framer-motion`: High-performance animations.
+    *   `three.js` / `@react-three/fiber`: 3D rendering.
+    *   `cobe`: Lightweight WebGL globe.
+*   **State & Networking**:
+    *   Native WebSockets (Real-time Audio).
+    *   React Hooks (Local State).
+*   **Components**: `lucide-react` (Icons), `recharts` (Data Viz).
+
+### **Backend (Server)**
+*   **Framework**: FastAPI (Async Python).
+*   **Server**: Uvicorn (ASGI).
+*   **Concurrency**: `asyncio` (Event loops for specific non-blocking I/O).
+*   **Validation**: Pydantic.
+*   **Environment**: `python-dotenv`.
+
+### **Artificial Intelligence (The Brain)**
+*   **Speech-to-Text (STT)**: **Deepgram Nova-2** (Streaming WebSocket API).
+*   **Threat Detection Engine**: **Cerebras** (Llama 3.3-70b via OpenAI-compatible SDK).
+*   **Secondary Verification**: **Vultr Serverless Inference** (Llama 2 via OpenAI-compatible SDK).
+*   **Text-to-Speech (TTS)**: **ElevenLabs** (Turbo v2 for low-latency voice generation).
+
+### **Cloud & Infrastructure**
+*   **Compute**: **Vultr Cloud Compute** (Ubuntu 24.04, Shared vCPU).
+*   **Storage & Memory**: **Raindrop** (LiquidMetal AI SmartBuckets).
+    *   `sentinel-evidence-sb`: Logs & Evidence.
+    *   `agent-memory-sb`: Vector context.
+*   **Orchestration**: Docker (Containerization).
+*   **Reverse Proxy**: Nginx (Production only).
+
+### **Third-Party APIs**
+*   **Authentication**: **WorkOS** (AuthKit).
+*   **Payments**: **Stripe** (Subscriptions, Checkout, Webhooks).
+
+---
+
 ## 📂 Directory Structure
 
 ```text

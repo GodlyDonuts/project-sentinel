@@ -71,8 +71,24 @@ export const Login: React.FC = () => {
         setError('');
 
         if (!WORKOS_CLIENT_ID || !WORKOS_REDIRECT_URI) {
+            // Check for Dev Mode Exception
+            if (import.meta.env.DEV) {
+                console.log("DEV MODE: Skipping Auth Handshake");
+                setStatus('verifying');
+                setTimeout(() => navigate('/dashboard'), 1000);
+                return;
+            }
+
             setError('SYS_CONFIG_ERROR // MISSING_CREDENTIALS');
             playAlert();
+            return;
+        }
+
+        // DEVELOPER MODE: BYPASS AUTH
+        if (import.meta.env.DEV) {
+            console.log("DEV MODE: Skipping Auth Handshake");
+            setStatus('verifying'); // Show loader briefly
+            setTimeout(() => navigate('/dashboard'), 1500); // Fake delay for effect
             return;
         }
 

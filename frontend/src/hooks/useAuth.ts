@@ -16,6 +16,20 @@ export const useAuth = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        // DEVELOPER MODE: BYPASS AUTH (Force Login)
+        if (import.meta.env.DEV) {
+            console.log("DEV MODE: Auto-logging in as Dev Agent (Free Tier)");
+            setUser({
+                id: 'dev-agent-001',
+                email: 'dev@localhost',
+                firstName: 'Dev',
+                lastName: 'Agent',
+                metadata: { premium: 'true' }
+            });
+            setLoading(false);
+            return;
+        }
+
         // Try to recover user from localStorage
         const storedUser = localStorage.getItem('sentinel_user');
         if (storedUser) {

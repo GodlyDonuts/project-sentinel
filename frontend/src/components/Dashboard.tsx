@@ -10,6 +10,8 @@ import { AlertSystem } from './AlertSystem';
 import { GhostInterceptor } from './intercept/GhostInterceptor';
 import { useAuth } from '../hooks/useAuth';
 import { PaymentGateway } from './payment/PaymentGateway'; // Keep payment access
+import { HUDFrame } from './layout/HUDFrame';
+import { AudioVisualizer } from './AudioVisualizer';
 import './Dashboard.css';
 
 export const Dashboard: React.FC = () => {
@@ -59,6 +61,8 @@ export const Dashboard: React.FC = () => {
 
     const handleUpgrade = async () => {
         playClick();
+        stopListening(); // Stop listening immediately
+        setIsThreat(false); // Clear threat state so the red background fades
         setIsLoadingPayment(true);
         try {
             // Fetch client secret from backend
@@ -88,13 +92,24 @@ export const Dashboard: React.FC = () => {
     return (
         <div className="h-screen w-screen bg-[#050505] text-white overflow-hidden relative selection:bg-sentinel-green selection:text-black font-sans">
 
-            {/* 1. LAYER: THE UNIVERSE (Globe) */}
+            {/* 0. LAYER: CRT & HUD FRAME (The Lens) */}
+            <HUDFrame />
+
+            {/* 1. LAYER: THE UNIVERSE (Globe + Audio Terrain) */}
             <div className={`absolute inset-0 transition-opacity duration-1000 ${isThreat ? 'opacity-30' : 'opacity-100'}`}>
-                {/* The Globe is now the HERO. It sits center stage. */}
-                <WorldGlobe threatScore={threatScore} />
+
+                {/* A. The Globe (Center) */}
+                <div className="absolute inset-0 z-10 scale-75 md:scale-100 transition-transform duration-1000">
+                    <WorldGlobe threatScore={threatScore} isActive={isListening} isGhostMode={ghostMode} />
+                </div>
+
+                {/* B. The Audio Horizon (Bottom Floor) */}
+                <div className="absolute bottom-0 left-0 right-0 h-[40vh] z-0 opacity-50 mask-gradient-t">
+                    <AudioVisualizer isActive={isListening} />
+                </div>
 
                 {/* Vignette to focus center */}
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_20%,#050505_100%)] pointer-events-none" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_20%,#050505_120%)] pointer-events-none z-20" />
             </div>
 
             {/* 2. LAYER: CRITICAL ALERTS */}
@@ -109,12 +124,13 @@ export const Dashboard: React.FC = () => {
                 onDismiss={() => {
                     setThreatScore(0);
                     setIsThreat(false);
+                    stopListening(); // Stop listening explicitly
                 }}
             />
             <audio ref={audioRef} style={{ display: 'none' }} />
 
             {/* 3. LAYER: HUD INTERFACE (Minimalist) */}
-            <div className="relative z-10 h-full w-full flex flex-col p-8 pointer-events-none">
+            <div className="relative z-30 h-full w-full flex flex-col p-8 pointer-events-none">
 
                 {/* TOP LEFT: BRANDING */}
                 <div className="absolute top-8 left-8 pointer-events-auto flex flex-col gap-1">
@@ -151,29 +167,36 @@ export const Dashboard: React.FC = () => {
                     )}
                 </div>
 
-                {/* CENTER: THE ACTIVATOR (The "Iron Man" Arc Reactor) */}
-                <div className="flex-1 flex flex-col items-center justify-center pointer-events-auto">
-                    {/* The Button */}
-                    <button
-                        onClick={handleToggle}
-                        onMouseEnter={playHover}
-                        className={`
-                            relative group w-32 h-32 rounded-full flex items-center justify-center transition-all duration-700
-                            ${isListening
-                                ? 'bg-red-500/10 shadow-[0_0_100px_rgba(255,0,0,0.4)] scale-110'
-                                : 'bg-white/5 hover:bg-white/10 shadow-[0_0_60px_rgba(0,255,65,0.1)] hover:scale-105'
-                            }
-                        `}
-                    >
-                        {/* Ring Animations */}
-                        <div className={`absolute inset-0 rounded-full border border-white/20 ${isListening ? 'animate-ping opacity-20' : 'opacity-100'}`} />
-                        <div className={`absolute -inset-4 rounded-full border border-dashed border-white/10 animate-spin-slow`} />
+                {/* CENTER: THE ACTIVATOR (Enhanced) */}
+                <div className="flex-1 flex flex-col items-center justify-center pointer-events-auto mt-20"> {/* pushed down slightly */}
 
-                        <Power size={32} className={`transition-colors duration-300 ${isListening ? 'text-red-500' : 'text-white'}`} />
-                    </button>
+                    {/* The Button Container */}
+                    <div className="relative group">
+                        {/* Outer Rotating Ring 1 */}
+                        <div className={`absolute -inset-8 rounded-full border border-white/5 border-dashed animate-spin-slow ${isListening ? 'opacity-100 duration-[10s]' : 'opacity-20'}`} />
+
+                        {/* Outer Rotating Ring 2 (Counter) */}
+                        <div className={`absolute -inset-16 rounded-full border border-sentinel-green/10 border-dotted animate-reverse-spin ${isListening ? 'opacity-100' : 'opacity-0'}`} />
+
+                        {/* The Button */}
+                        <button
+                            onClick={handleToggle}
+                            onMouseEnter={playHover}
+                            className={`
+                                relative w-32 h-32 rounded-full flex items-center justify-center transition-all duration-700
+                                backdrop-blur-md border border-white/10
+                                ${isListening
+                                    ? 'bg-red-500/10 shadow-[0_0_100px_rgba(255,0,0,0.6)] scale-110 border-red-500/50'
+                                    : 'bg-white/5 hover:bg-white/10 shadow-[0_0_60px_rgba(0,255,65,0.2)] hover:scale-105 hover:border-sentinel-green/50'
+                                }
+                            `}
+                        >
+                            <Power size={32} className={`transition-colors duration-300 ${isListening ? 'text-red-500 drop-shadow-neon-red' : 'text-white'}`} />
+                        </button>
+                    </div>
 
                     {/* Status Text under button */}
-                    <div className="mt-8 text-center">
+                    <div className="mt-20 text-center">
                         <p className="font-display font-bold text-lg tracking-[0.2em] text-white/90">
                             {isListening ? 'SYSTEM ARMED' : 'STANDBY'}
                         </p>

@@ -23,3 +23,46 @@ canvas {
     display: block;
     /* Prevents tiny inline gaps */
 }
+
+/* HUD Animations */
+.mask-gradient-t {
+    mask-image: linear-gradient(to top, black 0%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to top, black 0%, transparent 100%);
+}
+
+.mask-gradient-b {
+    mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+}
+
+@keyframes reverse-spin {
+    from {
+        transform: rotate(360deg);
+    }
+
+    to {
+        transform: rotate(0deg);
+    }
+}
+
+.animate-reverse-spin {
+    animation: reverse-spin 20s linear infinite;
+}
+
+@keyframes scan-text {
+    0% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(-50%);
+    }
+}
+
+.animate-scan-text {
+    animation: scan-text 10s linear infinite;
+}
+
+.drop-shadow-neon-red {
+    filter: drop-shadow(0 0 10px rgba(255, 0, 60, 0.8));
+}

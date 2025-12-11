@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { useWebSocket } from '../hooks/useWebSocket';
 import { useAudioProcessing } from '../hooks/useAudioProcessing';
 import { useAudioRecorder } from '../hooks/useAudioRecorder';

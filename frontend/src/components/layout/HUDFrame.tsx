@@ -10,11 +10,11 @@ export const HUDFrame: React.FC = () => {
             <div className="absolute top-4 left-4 w-[200px] h-[2px] bg-gradient-to-r from-sentinel-green/50 to-transparent" />
 
             {/* Top Right */}
-            <div className="absolute top-4 right-4 w-64 h-32 border-r-2 border-t-2 border-white/20 rounded-tr-3xl opacity-50 flex flex-col items-end pt-2 pr-4">
-                <div className="flex gap-2 mb-1">
-                    <span className="w-2 h-2 bg-white/20 rounded-full" />
-                    <span className="w-2 h-2 bg-white/20 rounded-full" />
-                    <span className="w-2 h-2 bg-white/20 rounded-full" />
+            <div className="absolute top-4 right-4 w-64 h-32 border-r-2 border-t-2 border-white/20 rounded-tr-3xl opacity-50 flex flex-col items-end pt-2 pr-4 text-right">
+                {/* Decorative Dashes */}
+                <div className="flex gap-1 mb-2">
+                    <span className="w-8 h-1 bg-white/20" />
+                    <span className="w-4 h-1 bg-white/20" />
                 </div>
             </div>
 

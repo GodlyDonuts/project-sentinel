@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Login } from './components/Login';
 import { Dashboard } from './components/Dashboard';
 import { LandingPage } from './components/LandingPage';
+import { Changelog } from './components/Changelog';
+import { HelpAgent } from './components/HelpAgent';
 import { CRTOverlay } from './components/layout/CRTOverlay';
 import { ProtectedRoute } from './components/layout/ProtectedRoute';
 import './App.css';
@@ -13,6 +15,8 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/changelog" element={<Changelog />} />
+        <Route path="/help" element={<HelpAgent />} />
         <Route
           path="/dashboard"
           element={

@@ -13,3 +13,4 @@ python-dotenv
 lm-raindrop
 stripe
 deepgram-sdk
+google-generativeai

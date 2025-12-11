@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 # Load env before imports
 load_dotenv()
 
-from routers import auth, monitor, stats, evidence, payment
+from routers import auth, monitor, stats, evidence, payment, help
 from core.config import settings
 
 # 1. SETUP LOGGING
@@ -31,6 +31,7 @@ app.include_router(payment.router, prefix="/api/payment", tags=["payment"])
 app.include_router(monitor.router, prefix="/ws", tags=["monitor"]) # Note: monitor router handles /monitor path in decorator? No, decorator has /monitor, prefix /ws -> /ws/monitor. Correct.
 app.include_router(stats.router, prefix="/stats", tags=["stats"])
 app.include_router(evidence.router, prefix="/evidence", tags=["evidence"])
+app.include_router(help.router, prefix="/api/help", tags=["help"])
 
 @app.get("/health")
 async def health_check():

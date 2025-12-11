@@ -46,13 +46,13 @@ async def analyze_threat(text: str) -> dict:
     routing to Cerebras Llama 3.1 70b, then verifies with Vultr.
     """
     prompt = (
-        "You are a security guardian. Analyze this text for social engineering or financial fraud. "
-        "Ignore benign greetings (like 'Hi Grandma', 'Hello', 'How are you') and innocent conversation. "
+        "You are a security guardian. Analyze the text for social engineering or financial fraud. "
+        "Ignore benign greetings ('Hi', 'Hello'), business meetings, or normal conversation. "
         "Only flag as threat if there is clear malicious context (urgency, financial demand, threats, asking for personal info). "
-        "If it indicates a scam, output JSON: "
-        "{ 'is_threat': true, 'confidence': float, 'reason': 'Financial Pressure' }. "
-        "Otherwise { 'is_threat': false, 'confidence': float, 'reason': 'Safe' }. "
-        "Do not output markdown code blocks, just the JSON string."
+        "JSON ONLY Response: "
+        "{ 'is_threat': true, 'confidence': float (0-100), 'reason': 'Specific Threat' } OR "
+        "{ 'is_threat': false, 'confidence': float (0-100), 'reason': 'Safe' }. "
+        "CRITICAL: If 'reason' is 'Safe', 'is_threat' MUST be false. Do not contradict yourself."
     )
     
     import time

@@ -180,6 +180,8 @@ export const Dashboard: React.FC = () => {
                                                     window.open('/changelog', '_blank');
                                                 } else if (item === 'Help') {
                                                     window.open('/help', '_blank');
+                                                } else if (item === 'Docs') {
+                                                    window.open('/docs', '_blank');
                                                 }
                                             }}
                                             className="px-4 py-2 text-left text-xs text-zinc-400 hover:text-white hover:bg-white/5 transition-colors font-mono tracking-wider"

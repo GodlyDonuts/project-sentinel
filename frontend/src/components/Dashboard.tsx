@@ -138,6 +138,7 @@ export const Dashboard: React.FC = () => {
                     setIsThreat(false);
                     stopListening(); // Stop listening explicitly
                 }}
+                isLoading={isLoadingPayment}
             />
             <audio ref={audioRef} style={{ display: 'none' }} />
 
@@ -317,7 +318,7 @@ export const Dashboard: React.FC = () => {
 
             {/* SETTINGS MODAL */}
             {isSettingsOpen && (
-                <SettingsModal onClose={() => setIsSettingsOpen(false)} onUpgrade={handleUpgrade} />
+                <SettingsModal onClose={() => setIsSettingsOpen(false)} onUpgrade={handleUpgrade} isLoading={isLoadingPayment} />
             )}
         </div>
     );

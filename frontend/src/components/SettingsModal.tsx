@@ -6,9 +6,10 @@ import { useAuth } from '../hooks/useAuth';
 interface SettingsModalProps {
     onClose: () => void;
     onUpgrade: () => void;
+    isLoading?: boolean;
 }
 
-export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onUpgrade }) => {
+export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onUpgrade, isLoading = false }) => {
     const { user } = useAuth();
     const [activeTab, setActiveTab] = useState<'identity' | 'developer'>('identity');
     const [apiKey, setApiKey] = useState('sk_live_8f7a2d9c1e4b5a6d7e8f9a0b1c2d3e4f');
@@ -318,9 +319,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onUpgrade
 
                                         <button
                                             onClick={onUpgrade}
-                                            className="mt-4 px-8 py-3 bg-sentinel-green hover:bg-sentinel-green/90 text-black font-bold font-display tracking-wider rounded transition-all hover:scale-105 shadow-[0_0_20px_rgba(0,255,65,0.3)] relative z-10"
+                                            disabled={isLoading}
+                                            className="mt-4 px-8 py-3 bg-sentinel-green hover:bg-sentinel-green/90 disabled:bg-sentinel-green/50 disabled:cursor-wait text-black font-bold font-display tracking-wider rounded transition-all hover:scale-105 shadow-[0_0_20px_rgba(0,255,65,0.3)] relative z-10 flex items-center gap-2"
                                         >
-                                            UPGRADE • $9.99/MO
+                                            {isLoading ? (
+                                                <>
+                                                    <span className="animate-spin text-black/80">⟳</span>
+                                                    <span>INITIALIZING...</span>
+                                                </>
+                                            ) : (
+                                                'UPGRADE • $9.99/MO'
+                                            )}
                                         </button>
                                     </div>
                                 )}

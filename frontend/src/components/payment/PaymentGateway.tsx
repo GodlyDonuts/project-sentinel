@@ -78,20 +78,20 @@ const CheckoutForm = ({ onSuccess, onCancel, userId }: { onSuccess: () => void, 
                 </div>
             )}
 
-            <div className="flex gap-4">
+            <div className="flex gap-3">
                 <button
                     type="button"
                     onClick={onCancel}
-                    className="flex-1 py-3 border border-white/10 rounded text-gray-400 hover:text-white hover:bg-white/5 transition-colors text-xs tracking-widest uppercase font-mono"
+                    className="w-32 py-3 border border-white/10 rounded text-zinc-500 hover:text-red-500 hover:border-red-500/50 hover:bg-red-500/5 transition-all text-xs tracking-widest uppercase font-mono"
                 >
                     Abort
                 </button>
                 <button
                     type="submit"
                     disabled={!stripe || loading}
-                    className="flex-1 bg-sentinel-green text-black font-bold py-3 rounded hover:bg-white hover:shadow-neon-green transition-all uppercase tracking-widest text-xs flex items-center justify-center gap-2"
+                    className="flex-1 bg-sentinel-green text-black font-bold py-3 rounded hover:bg-white hover:shadow-neon-green transition-all uppercase tracking-wide text-xs flex items-center justify-center gap-1.5"
                 >
-                    {loading ? <span className="animate-spin">⟳</span> : <><Lock size={14} /> Authorize Transaction</>}
+                    {loading ? <span className="animate-spin">⟳</span> : <div className="flex items-center gap-1.5"><Lock size={12} strokeWidth={3} /> <span>AUTHORIZE TRANSACTION</span></div>}
                 </button>
             </div>
         </form>
@@ -137,7 +137,7 @@ export const PaymentGateway: React.FC<PaymentGatewayProps> = ({ clientSecret, on
 
     // Payment Form UI
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md p-4" onClick={handleBackdropClick}>
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 backdrop-blur-md p-4" onClick={handleBackdropClick}>
             <motion.div
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -164,12 +164,26 @@ export const PaymentGateway: React.FC<PaymentGatewayProps> = ({ clientSecret, on
 
                     {/* Form Container */}
                     <div className="p-8 bg-black/50 overflow-y-auto no-scrollbar">
-                        <div className="mb-6 flex justify-between items-end">
-                            <div>
-                                <h3 className="text-white font-bold text-lg">Sentinel One</h3>
-                                <p className="text-xs text-gray-500 font-mono">Monthly Subscription</p>
+                        <div className="mb-8 p-4 bg-white/5 rounded-lg border border-white/10 relative overflow-hidden group">
+                            <div className="absolute inset-0 bg-sentinel-green/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+
+                            <div className="flex justify-between items-start relative z-10">
+                                <div>
+                                    <h3 className="text-white font-display font-bold text-2xl tracking-[0.1em] uppercase mb-1 drop-shadow-md">Sentinel One</h3>
+                                    <div className="flex items-center gap-2 text-xs text-sentinel-green/80 font-mono tracking-wider uppercase mb-3">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-sentinel-green animate-pulse" />
+                                        Monthly Subscription
+                                    </div>
+                                    <div className="flex gap-3">
+                                        <span className="text-[10px] text-zinc-500 bg-black/50 px-2 py-1 rounded border border-white/5">AES-256</span>
+                                        <span className="text-[10px] text-zinc-500 bg-black/50 px-2 py-1 rounded border border-white/5">NO_LOGS</span>
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <div className="text-3xl font-mono text-sentinel-green font-bold drop-shadow-[0_0_8px_rgba(0,255,65,0.6)]">$9.99</div>
+                                    <div className="text-[10px] text-zinc-500 font-mono mt-1">/ MONTH</div>
+                                </div>
                             </div>
-                            <div className="text-2xl font-mono text-sentinel-green">$9.99</div>
                         </div>
 
                         {clientSecret && stripePromise && (

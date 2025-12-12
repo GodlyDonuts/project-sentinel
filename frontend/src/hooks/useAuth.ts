@@ -18,17 +18,39 @@ export const useAuth = () => {
     useEffect(() => {
         // DEVELOPER MODE: BYPASS AUTH (Force Login)
         if (import.meta.env.DEV) {
-            console.log("DEV MODE: Auto-logging in as Dev Agent (Free Tier)");
+            const persistedPremium = localStorage.getItem('sentinel_dev_premium') || 'false';
+            console.log(`DEV MODE: Auto-logging in as Dev Agent (Premium: ${persistedPremium})`);
+
             setUser({
                 id: 'dev-agent-001',
                 email: 'dev@localhost',
                 firstName: 'Dev',
                 lastName: 'Agent',
-                metadata: { premium: 'true' }
+                metadata: { premium: persistedPremium }
             });
             setLoading(false);
-            return;
         }
+
+        // Expose Debug Tools
+        (window as any).setPremium = (isPremium: boolean) => {
+            const status = isPremium ? 'true' : 'false';
+            console.log(`✨ SETTING PREMIUM STATUS: ${status}`);
+            localStorage.setItem('sentinel_dev_premium', status);
+
+            // Dispatch event for real-time updates across components
+            window.dispatchEvent(new CustomEvent('sentinel:premium-update', { detail: status }));
+        };
+
+        const handlePremiumUpdate = (e: CustomEvent) => {
+            setUser(prev => {
+                if (!prev) return null;
+                return { ...prev, metadata: { ...prev.metadata, premium: e.detail } };
+            });
+        };
+
+        window.addEventListener('sentinel:premium-update', handlePremiumUpdate as EventListener);
+
+        if (import.meta.env.DEV) return () => window.removeEventListener('sentinel:premium-update', handlePremiumUpdate as EventListener);
 
         // Try to recover user from localStorage
         const storedUser = localStorage.getItem('sentinel_user');

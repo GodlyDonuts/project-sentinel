@@ -21,6 +21,23 @@ export const useWebSocket = ({ onAudioData, onTranscriptUpdate }: WebSocketProps
         onTranscriptUpdateRef.current = onTranscriptUpdate;
     }, [onAudioData, onTranscriptUpdate]);
 
+    // Debug Triggers
+    useEffect(() => {
+        (window as any).triggerThreat = (score: number = 0.95) => {
+            console.log("⚠️ MANUAL THREAT TRIGGERED");
+            setThreatScore(score);
+            setIsThreat(true);
+            setThreatReason("Manual Console Trigger");
+        };
+
+        (window as any).clearThreat = () => {
+            console.log("✅ THREAT CLEARED");
+            setThreatScore(0);
+            setIsThreat(false);
+            setThreatReason("");
+        };
+    }, []);
+
     useEffect(() => {
         let isMounted = true;
         let reconnectTimeout: ReturnType<typeof setTimeout>;

@@ -5,17 +5,29 @@ import { Brain, Zap, Activity, Mic, Cpu, Database } from 'lucide-react';
 // THE SCRIPT: A simulated "Grandma" persona trolling a scammer
 // We explicitly log the "Tech Stack" events here for the judges to see.
 const GHOST_SCRIPT = [
-    { type: 'system', label: 'CEREBRAS_INF', text: 'Allocating Wafer-Scale Engine (CS-3)...' },
-    { type: 'system', label: 'RAINDROP_MEM', text: 'Hydrating Context from "scam-patterns-v4" bucket...' },
-    { type: 'scammer', text: "Hello? Are you there? Do not hang up!", delay: 1000 },
-    { type: 'thought', text: "ANALYSIS: High Stress Detected // STRATEGY: Confusion", delay: 1200 },
-    { type: 'ghost', text: "Yes, yes, I'm here. My grandson said something about a... a cookie? On the computer?", delay: 3500 },
-    { type: 'system', label: 'ELEVENLABS', text: 'Streaming Audio (Latency: 24ms)', delay: 3600 },
-    { type: 'scammer', text: "No cookies! I need you to open the program I told you about!", delay: 5500 },
-    { type: 'thought', text: "RETRIEVAL: 'Tech Support' Counter-Script loaded from Raindrop", delay: 6000 },
-    { type: 'ghost', text: "Is that the 'Internet Exploder'? It says '404' on the screen. Is that the money?", delay: 8500 },
-    { type: 'system', label: 'CEREBRAS_INF', text: 'Token Gen Speed: 1,240 t/s', delay: 8600 },
-    { type: 'scammer', text: "LISTEN TO ME. Click the start button!", delay: 10500 },
+    { type: 'system', label: 'SENTINEL_CORE', text: 'INTERCEPT_PROTOCOL_INITIATED', delay: 100 },
+    { type: 'system', label: 'VOICE_CLONE', text: 'Loading Persona: "Margaret_82_Confused.wav"', delay: 400 },
+
+    // AI Takes Over immediately after the "Target Gift Cards" demand
+    { type: 'thought', text: 'DETECTED: "Target Gift Cards" // PATTERN: Refund Scams // STRATEGY: Feign Incompetence', delay: 500 },
+    { type: 'ghost', text: "Target? You mean the store with the little red dog? Oh dear... I don't think I can drive there, Officer Wilson. My hip has been acting up since the storm of '98.", delay: 3000 },
+
+    { type: 'scammer', text: "Mrs. Dawson, this is urgent! You must take a taxi! The warrant will be executed in 30 minutes!", delay: 6500 },
+
+    { type: 'system', label: 'CEREBRAS_INF', text: 'Sentiment: AGGRESSIVE (0.98)', delay: 6700 },
+    { type: 'thought', text: 'TACTIC: Tangential Distraction // TOPIC: Coupons', delay: 7500 },
+    { type: 'ghost', text: "A taxi? Do they take checks? I have a coupon for a taxi somewhere... or was it for cat food? Mr. Whiskers is very picky, you know. He only eats the paté.", delay: 9500 },
+
+    { type: 'scammer', text: "Forget the cat! Do you want to go to jail? Get your purse and go now!", delay: 12500 },
+
+    { type: 'system', label: 'RAINDROP_MEM', text: 'Logging Pattern: [COERCION_VIA_ARREST_THREAT] -> Evidence Bucket #492', delay: 13000 },
+    { type: 'thought', text: 'TACTIC: False Compliance // DELAY: Searching for Purse', delay: 13500 },
+    { type: 'ghost', text: "Okay, okay, don't yell at me... I'm looking for my purse. I usually keep it in the cookie jar to hide it from the grandkids. Wait... why is there a remote control in here?", delay: 16500 },
+
+    { type: 'scammer', text: "Just find the money, Margaret! Two. Thousand. Dollars.", delay: 19500 },
+
+    { type: 'system', label: 'ELEVENLABS', text: 'Injecting "Confusion_Stutter" latency...', delay: 20000 },
+    { type: 'ghost', text: "Two thousand? Oh my... I don't think I have that much in the jar. I have... twelve dollars and a button. Can I send you the button? It's a very nice button.", delay: 22500 },
 ];
 
 export const GhostInterceptor = ({ onDisengage }: { onDisengage: () => void }) => {

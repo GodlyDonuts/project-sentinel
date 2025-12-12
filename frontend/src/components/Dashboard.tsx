@@ -13,6 +13,7 @@ import { PaymentGateway } from './payment/PaymentGateway'; // Keep payment acces
 import { HUDFrame } from './layout/HUDFrame';
 import { AudioVisualizer } from './AudioVisualizer';
 import { SettingsModal } from './SettingsModal';
+import { useScamSimulation } from '../hooks/useScamSimulation';
 import './Dashboard.css';
 
 export const Dashboard: React.FC = () => {
@@ -57,6 +58,26 @@ export const Dashboard: React.FC = () => {
     const { isRecording: isListening, startRecording: startListening, stopRecording: stopListening } = useAudioRecorder({
         onAudioData: sendAudio,
         timeslice: 500
+    });
+
+    // HACKATHON DEMO MODE
+    useScamSimulation({
+        onTranscriptUpdate: (text, isFinal) => {
+            if (isFinal) {
+                setFinalizedLines(prev => [...prev, text]);
+                setInterimLine('');
+            } else {
+                setInterimLine(text);
+            }
+        },
+        onTriggerThreat: (score) => {
+            setThreatScore(score);
+            setIsThreat(true);
+            playAlert();
+        },
+        onStart: () => {
+            if (!isListening) startListening();
+        }
     });
 
     const handleToggle = () => {
@@ -131,6 +152,8 @@ export const Dashboard: React.FC = () => {
                 onEngageGhost={() => {
                     playConfirm();
                     setGhostMode(true);
+                    setThreatScore(0); // Force modal close
+                    setIsThreat(false);
                 }}
                 onUpgrade={handleUpgrade}
                 onDismiss={() => {
